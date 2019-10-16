@@ -49,45 +49,14 @@ int print_type(struct stat st) {
 }
 
 int print_perm(struct stat st) {
-	if (st.st_mode & S_IRUSR)
-	{
-		printf("r");
-	}
-	if (st.st_mode & S_IWUSR)
-	{
-		printf("w");
-	}
-	if (st.st_mode & S_IXUSR)
-	{
-		printf("x");
-	}
-	
-	if (st.st_mode & S_IRGRP)
-	{
-		printf("r");
-	}
-	if (st.st_mode & S_IWGRP)
-	{
-		printf("w");
-	}
-	if (st.st_mode & S_IXGRP)
-	{
-		printf("x");
-	}
-
-	if (st.st_mode & S_IROTH)
-	{
-		printf("r");
-	}
-	if (st.st_mode & S_IWOTH)
-	{
-		printf("w");
-	}
-	if (st.st_mode & S_IXOTH)
-	{
-		printf("x");
-	}
-	printf(" ");
+	int i;
+	unsigned int mask = 0x7; 
+	static char* perm[] = { "---","--x","-w-","-wx","r--","r-x","rw-","rwx" };
+	for (i = 3;i > 0;i--) { 
+		printf("%3s", perm[(st.st_mode >> (i - 1) * 3) & mask]); 
+	} 
+        printf(" ");
+	return 0;
 }
 
 int process_ls_l(char* path)
@@ -131,15 +100,15 @@ int process_ls_l(char* path)
 		struct group* gr;
 		gr = getgrgid(st.st_gid);
 		printf("%s", gr->gr_name);
-		printf(" ");
-		printf("%5ld", st.st_size);
+                printf(" ");
+		printf("%ld", st.st_size);
 		printf(" ");
 		char *p_time;
 		p_time = ctime(&st.st_mtime);
 		for (int i = 0; p_time[i] != 0 && p_time[i] != '\n'; i++) {
 			putchar(p_time[i]);
-			printf(" ");
 		}
+		printf(" ");
 		printf("%s\n", direntp->d_name);
 	}
 	closedir(dirp);
